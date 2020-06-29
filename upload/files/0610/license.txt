@@ -1,0 +1,40 @@
+http://jetbrains-license-server
+
+http://idea.lanyus.com
+
+http://fls.jetbrains-agent.com
+
+
+
+#添加mod_wsgi.so模块,这三行是上面命令行中显示出来的
+LoadFile "d:/python/python35/python35.dll"
+LoadModule wsgi_module "d:/python/python35/lib/site-packages/mod_wsgi/server/mod_wsgi.cp35-win_amd64.pyd"
+WSGIPythonHome "d:/python/python35"
+
+#指定项目的wsgi.py配置文件路径,这个py文件是在你的Django项目中  
+WSGIScriptAlias / d:/Python/Exam/django/crm/crm/wsgi.py  
+  
+#指定项目目录,即你的Django项目路径 
+WSGIPythonPath  d:/Python/Exam/django/crm
+  
+<Directory d:/Python/Exam/django/crm/crm>  
+<Files wsgi.py>  
+    Require all granted  
+</Files>  
+</Directory>  
+  
+#项目静态文件地址, Django项目中静态文件的路径  
+Alias /static d:/Python/Exam/django/crm/upload
+<Directory d:/Python/Exam/django/crm/upload>  
+    AllowOverride None  
+    Options None  
+    Require all granted  
+</Directory>  
+  
+#项目media地址, 上传图片等文件夹的路径  
+Alias /upload d:/Python/Exam/django/crm/upload
+<Directory d:/Python/Exam/django/crm/upload>  
+    AllowOverride None  
+    Options None  
+    Require all granted  
+</Directory>  

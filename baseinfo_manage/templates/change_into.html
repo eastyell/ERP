@@ -1,0 +1,17 @@
+{# 继承xadmin的侧边栏和导航栏 #}
+{% extends 'xadmin/base_site.html' %}
+
+{# 去掉标签栏 #}
+{% block content-nav %}
+
+{% endblock %}
+
+{% block content %} 
+{# 要展示的数据 #} 
+    <h3>采购下单</h3>
+
+<button>test </button>
+    {% for i in bill_message%}
+        {{ i }}
+    {% endfor %} 
+{% endblock content %}

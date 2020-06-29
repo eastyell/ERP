@@ -1,0 +1,73 @@
+{% load i18n static %}
+{% if cl.search_fields %}
+
+<body onload="load()">
+
+  <script type="text/javascript">
+    function msg(){
+    	// alert("Hello World");
+        // window.location.href="http://blog.sina.com.cn/mleavs";
+        window.open('ImportExcel.html','_blank') //打开一个新窗口
+    }
+    function getContent(value,content){
+       alert("选中的值是"+value+"选中的内容是"+content);
+    }
+    function load(){
+       //根据id查找对象，
+       var obj=document.getElementById('group');
+        //添加一个选项
+        obj.options.add(new Option('', ''));
+        obj.options.add(new Option('{{ cl.search_name.items.key}}', '{{ cl.search_name.items.0.value}}'));
+        obj.options.add(new Option('{{ cl.search_name.items.1.key}}', '{{ cl.search_name.items.1.value}}'));
+        // for (var value of cl.search_name) {
+        //   obj.options.add(new Option('text2',value));
+        // }
+       // for(var i=0;i<2;i++){
+       //     // obj.options.add(new Option('text1', 'value'));
+       //     obj.options.add(new Option('text2', '{{ cl.search_name}}'));
+       // }
+       // function addOption(){
+       //    //根据id查找对象，
+       //    var obj=document.getElementById('group');
+       //    //添加一个选项
+       //    obj.options.add(new Option('text1','value1'));
+       //  }
+
+    }
+  </script>
+
+   <style>
+    .styled{background-color: rgba(200, 0, 0, 1);}
+    .styled:hover {background-color: rgba(255, 0, 0, 1)/*鼠标经过的颜色*/;}
+
+   </style>
+
+  {% for athlete in cl.search_fields %}
+    {{ athlete }}
+  {% endfor %}
+
+<div id="toolbar"><form id="changelist-search" method="get">
+<div><!-- DIV needed for valid HTML -->
+
+<!--<button value= 'test' onclick="javascript:window.open('https://www.xuewangzhan.net/','_blank');">-->
+
+<label>查询条件 {{ cl.query }}</label>
+<select id="group" value="1" onchange="getContent(this.value,this.options[this.selectedIndex].text)">
+<!--  <option value="1"></option>-->
+<!--  <option value="2">FRU</option>-->
+<!--  <option value="3">SN</option>-->
+<!--  <option value="4">PN</option>-->
+</select>
+<label for="searchbar">{{ cl.search_name}}{{cl.search_fields}} <img src="{% static "admin/img/search.svg" %}" alt="Search"></label>
+<input type="text" size="20" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" autofocus>
+<input type="submit" value="{% trans 'Search' %}">
+<!--<input type="button"  class="favorite styled" value= 'EXCEL批量导入' onclick=msg() style="margin-left: 800px">-->
+{% if show_result_count %}
+    <span class="small quiet">{% blocktrans count counter=cl.result_count %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %} (<a href="?{% if cl.is_popup %}_popup=1{% endif %}">{% if cl.show_full_result_count %}{% blocktrans with full_result_count=cl.full_result_count %}{{ full_result_count }} total{% endblocktrans %}{% else %}{% trans "Show all" %}{% endif %}</a>)</span>
+{% endif %}
+{% for pair in cl.params.items %}
+    {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}">{% endif %}
+{% endfor %}
+</div>
+</form></div>
+{% endif %}

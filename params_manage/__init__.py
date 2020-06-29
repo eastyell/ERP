@@ -1,0 +1,1 @@
+default_app_config = "params_manage.apps.ParamsManageConfig"

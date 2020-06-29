@@ -1,0 +1,1 @@
+default_app_config = "stockout_manage.apps.StockoutManageConfig"
