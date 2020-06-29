@@ -317,7 +317,7 @@ class ContactAdminPurchase_stockin_detail(object):
                purchase_stockin.save()
 
     list_display = ('bill_id','purchase_id','shopid','FRUSelect','SN','FRU','PN','desc','source','replace','useage',
-                    'price','quantity','location','image_data','remark','author','update_time')
+                    'price','quantity','location','image_data','remark','author','pub_date')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
     exclude = ('author',)

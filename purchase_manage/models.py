@@ -162,8 +162,8 @@ class Purchase_stockin_detail(models.Model):
     image_data.allow_tags = True
 
     remark = models.TextField(u'备注', null=True, blank=True)
-    pub_date = models.DateField(u'入库时间', auto_now_add=True, null=True)
-    author = models.CharField(u'操作人', max_length=10, default=None)
+    pub_date = models.DateField(u'入库时间', null=True)
+    author = models.CharField(u'入库人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     # # 根据FRU 更新库存
