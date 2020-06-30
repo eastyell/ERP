@@ -315,6 +315,14 @@ class ContactAdminPurchase_stockin_detail(object):
                purchase_stockin.shopid_id = obj.shopid_id
                purchase_stockin.FRUSelect_id = obj.FRUSelect_id
                purchase_stockin.save()
+               # 插入出入库报表数据
+               id = obj.bill_id
+               sql = 'insert into report_manage_stock_detail' \
+                     ' (bill_type,bill_id,sn, FRU, PN, price,quantity, useage,source, image,FRUSelect_id, author, remark, location_id,pub_date)' \
+                     'select 0,bill_id,sn, FRU, PN, price, quantity, useage,source, image, FRUSelect_id, author, remark, location_id,pub_date ' \
+                     'from purchase_manage_purchase_stockin_detail where bill_id="%s"' % id
+               generic.update(sql)
+
 
     list_display = ('bill_id','purchase_id','shopid','FRUSelect','SN','FRU','PN','desc','source','replace','useage',
                     'price','quantity','location','image_data','remark','author','pub_date')
