@@ -59,6 +59,8 @@ def getOrderMaxNO(orderType):
         id = orderType.upper() + time.strftime("%Y%m%d", time.localtime()) + '%'
         if (orderType.upper()=='CGD'):
            tableName = 'purchase_manage_purchase_order'
+        if (orderType.upper()=='WXLY'):
+           tableName = 'stockout_manage_repair_use'
         sql = 'select max(id) from %s where id like "%s"' %(tableName,id)
         cursor.execute(sql)
         maxid = cursor.fetchone()

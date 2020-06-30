@@ -8,6 +8,7 @@ from stockout_manage.models import *
 import datetime
 from xadmin import views
 import xadmin
+from common import generic
 
 # 自定义模型管理类，作用：告诉django在生成的管理页面上显示哪些内容。
 # class ContactAdminDevices(admin.ModelAdmin)
@@ -406,13 +407,27 @@ class ContactAdminRepair_usel(object):
         obj = self.new_obj
         flag = self.org_obj is None and 'create' or 'change'
         request = self.request
+        obj.author = str(request.user)
         if flag == 'create':  # 新增默认回填操作员
-            obj.author = str(request.user)
+            OrderNO = generic.getOrderMaxNO('WXLY')
+            obj.id = OrderNO
+            obj.save()
+            # 保存维修领用下单后，自动生成维修领用下单入库信息
+            id = obj.id
+            sql = 'insert into stockout_manage_repair_use_stockout' \
+                  ' (repairid_id, sn, FRU, PN, useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id)' \
+                  'select id, sn, FRU, PN, useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
+                  'from stockout_manage_repair_use where id="%s"' % id
+            generic.update(sql)
+            obj.remark = sql
             obj.save()
         else:
             obj.save()
 
-    list_display = ('id', 'shopid', 'quantity', 'price','remark', 'pub_date', 'author', 'update_time')
+    exclude = ('author', 'id', )
+
+    list_display = ('id', 'shopid', 'SN','FRU','FRUSelect','PN','desc','source','replace',
+                    'quantity', 'price','image_data','remark', 'pub_date', 'author')
 
 # 维修领用出库
 class ContactAdminRepair_use_stockout(object):
@@ -420,13 +435,16 @@ class ContactAdminRepair_use_stockout(object):
         obj = self.new_obj
         flag = self.org_obj is None and 'create' or 'change'
         request = self.request
-        if flag == 'create':  # 新增默认回填操作员
-            obj.author = str(request.user)
+        obj.author = str(request.user)
+        if flag == 'create':
+
             obj.save()
         else:
             obj.save()
 
-    list_display = ('id', 'shopid', 'quantity', 'remark', 'pub_date', 'author', 'update_time')
+    list_display = ('billid','repairid', 'shopid', 'SN', 'FRU', 'FRUSelect', 'PN', 'desc', 'source', 'replace',
+                    'quantity', 'price', 'image_data', 'remark', 'pub_date', 'author')
+    list_display_links = ['repairid']
 
 # Register your models here.
 

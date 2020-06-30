@@ -9,6 +9,7 @@ import xadmin
 from common import generic
 from xadmin.views.base import CommAdminView
 import time
+from xadmin.layout import Fieldset
 
 
 # 自定义页面
@@ -134,12 +135,6 @@ class ContactAdminPurchase_order_detail(object):
     # readonly_fields = ('bill_id', )
     ordering = ['-id', ]
 
-    # def get_readonly_fields(request, obj=None):
-    #     if obj.bill_id:
-    #         return ('bill_id')
-    #     else:
-    #         return super(ContactAdminPurchase_order_detail).get_readonly_fields(request, obj)
-
     # def get_readonly_fields(self, request, obj=None):
     #     fields = []
     #     if request.user.is_superuser:
@@ -148,26 +143,33 @@ class ContactAdminPurchase_order_detail(object):
     #         fields = ['boss_verified', 'deliver_during']
     #         return fields
     #
-    # def get_readonly_fields(self, obj=None):
+    # def get_readonly_fields(self, request, obj=None):
     #     # objs = object
-    #     if obj.bill_id == '':
+    #     print(obj)
+    #     if obj :
+    #         request.readonly_fields = ['bill_id']
+    #     else:
+    #         request.readonly_fields = []
+    #     return request.readonly_fields
+
+    # def get_readonly_fields(self, obj=None):
+    #     if self.user.is_superuser:
     #         self.readonly_fields = []
     #     else:
     #         self.readonly_fields = ['bill_id']
     #     return self.readonly_fields
 
-    # def get_readonly_fields(self, obj=None):
-    #     return ('FRU', 'desc', 'source', 'replace', 'price', 'image_data')
-    # def get_readonly_fields(self, obj=None):
-    #     if object.id:
-    #        return ('FRU', 'desc','source','replace','price','image_data')
-    #     else:
-    #         return []
+    # form_layout = (
+    #     Fieldset(None,
+    #              'pc_name', 'pc_icorn', 'pc_link', 'sort'
+    #              ),
+    #     Fieldset(None,
+    #              'pc_id', 'pc_parent', **{"style": "display:None"}  # 隐藏前面两个字段
+    #              ),
+    # )
 
-       # if obj.certainfield == something:
-       #          return ('field1', 'field2')
-       #      else:
-       #          return super(TranslationAdmin, self).get_readonly_fields(request, obj)
+
+
 
     def get_changeform_initial_data(self, request):
         # import datetime

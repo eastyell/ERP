@@ -8,7 +8,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from crm.settings import MEDIA_URL
 from params_manage.models import *
-from baseinfo_manage.models import Shop
+from baseinfo_manage.models import *
 import os
 
 # Create your models here.
@@ -307,14 +307,37 @@ class Device_lend_stockout(models.Model):
 
 # 维修领用下单
 class Repair_use(models.Model):
-    id = models.CharField('维修单号', primary_key= True, max_length=12)
-    shopid = models.ForeignKey(Shop, to_field='id', on_delete=models.CASCADE, verbose_name='商品名称', default='1')
-    quantity = models.IntegerField('数量')
-    price = models.FloatField('价格')
-    remark = models.CharField('备注', max_length=100)
-    pub_date = models.DateField(u'领用时间', auto_now_add=True, null=True)
-    author = models.CharField(u'领用人', max_length=10, default=None)
-    update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
+    id = models.CharField('维修领用单号', primary_key= True, max_length=30)
+    shopid = models.ForeignKey(Shop, to_field='id', on_delete=models.CASCADE, verbose_name='商品名称')
+    SN = models.CharField(u'SN码', max_length=15, null=True, blank=True)
+    FRU = models.CharField(u'FRU码', max_length=15, null=True, blank=True)
+    FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE,
+                                  verbose_name='FRU码 / PN码 / 整机型号')
+    PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
+    desc = models.CharField(u'描述', max_length=50, null=True, blank=True)
+    source = models.CharField(u'来源', max_length=30, null=True, blank=True)
+    replace = models.CharField(u'替代号', max_length=15, null=True, blank=True)
+    useage = models.IntegerField('使用年限', default=0)
+    price = models.FloatField('单价', default=1)
+    quantity = models.IntegerField('数量', default=1)
+
+    image = models.ImageField(u'图片', upload_to='images/%m%d', null=True, blank=True, )
+
+    def image_data(self):
+        if self.image != '':
+            return mark_safe(
+                '<a href="%s%s" target="blank" title="备件图片预览"> <img src="%s%s" height="50" width="50"/> </a>' % (
+                    MEDIA_URL, self.image, MEDIA_URL, self.image,))
+        else:
+            return ''
+
+    image_data.short_description = u'图片'
+    image_data.allow_tags = True
+
+    remark = models.TextField(u'备注', null=True, blank=True)
+    pub_date = models.DateTimeField(u'下单时间', auto_now_add=True, null=True)
+    author = models.CharField(u'下单人', max_length=10, default=None)
+    update_time = models.DateTimeField(u'修改时间', auto_now=True, null=True)
 
     # 下面为新增代码
     class Meta:
@@ -326,13 +349,38 @@ class Repair_use(models.Model):
 
 # 维修领用出库
 class Repair_use_stockout(models.Model):
-    id = models.CharField('维修单号', primary_key= True, max_length=12)
-    shopid = models.ForeignKey(Shop, to_field='id', on_delete=models.CASCADE, verbose_name='商品名称', default='1')
-    quantity = models.IntegerField('数量')
-    remark = models.CharField('备注', max_length=100)
-    pub_date = models.DateField(u'领用出库时间', auto_now_add=True, null=True)
-    author = models.CharField(u'出库人', max_length=10, default=None)
-    update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
+    billid = models.CharField('维修领用出库单', max_length=30, null=True, blank=True)
+    repairid = models.ForeignKey(Repair_use, to_field='id', on_delete=models.CASCADE, verbose_name='维修领用单号')
+    shopid = models.ForeignKey(Shop, to_field='id', on_delete=models.CASCADE, verbose_name='商品名称')
+    SN = models.CharField(u'SN码', max_length=15, null=True, blank=True)
+    FRU = models.CharField(u'FRU码', max_length=15, null=True, blank=True)
+    FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE,
+                                  verbose_name='FRU码 / PN码 / 整机型号')
+    PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
+    desc = models.CharField(u'描述', max_length=50, null=True, blank=True)
+    source = models.CharField(u'来源', max_length=30, null=True, blank=True)
+    replace = models.CharField(u'替代号', max_length=15, null=True, blank=True)
+    useage = models.IntegerField('使用年限', default=0)
+    price = models.FloatField('单价', default=1)
+    quantity = models.IntegerField('数量', default=1)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='库存位置', default= 1)
+    image = models.ImageField(u'图片', upload_to='images/%m%d', null=True, blank=True, )
+
+    def image_data(self):
+        if self.image != '':
+            return mark_safe(
+                '<a href="%s%s" target="blank" title="备件图片预览"> <img src="%s%s" height="50" width="50"/> </a>' % (
+                    MEDIA_URL, self.image, MEDIA_URL, self.image,))
+        else:
+            return ''
+
+    image_data.short_description = u'图片'
+    image_data.allow_tags = True
+
+    remark = models.TextField(u'备注', null=True, blank=True)
+    pub_date = models.DateTimeField(u'下单时间', auto_now_add=True, null=True)
+    author = models.CharField(u'下单人', max_length=10, default=None)
+    update_time = models.DateTimeField(u'修改时间', auto_now=True, null=True)
 
     # 下面为新增代码
     class Meta:
@@ -340,4 +388,7 @@ class Repair_use_stockout(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.id
+        if self.repairid:
+          return str(self.repairid)
+        else:
+          return ''
