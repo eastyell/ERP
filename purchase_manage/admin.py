@@ -40,22 +40,22 @@ class ContactAdminPurchase_order(object):
         obj.author = str(request.user)
         if flag == 'create':  # 新增默认回填操作员
             # obj.author = str(request.user)
-            id = 'CGD' + time.strftime("%Y%m%d", time.localtime()) + '%'
-            sql = 'select max(id) from purchase_manage_purchase_order where id like "%s"' % id
-            MaxOrderNO  = generic.getOrderNO(sql)
-            # obj.remark = sql
-            if not MaxOrderNO:
-                 MaxOrderNO = '001'
-            else:
-              # 查找倒数三个字符串为订单数字，自动加1
-              MaxOrderNO = int(MaxOrderNO[-3:]) + 1
-              #不足三位补0
-              if (len(str(MaxOrderNO)) == 1):
-                  MaxOrderNO = '00' + str(MaxOrderNO)
-              elif (len(MaxOrderNO) == 2):
-                  MaxOrderNO = '0' + str(MaxOrderNO)
-              else:
-                  MaxOrderNO = str(MaxOrderNO)
+            # id = 'CGD' + time.strftime("%Y%m%d", time.localtime()) + '%'
+            # sql = 'select max(id) from purchase_manage_purchase_order where id like "%s"' % id
+            # MaxOrderNO  = generic.getOrderNO(sql)
+            # # obj.remark = sql
+            # if not MaxOrderNO:
+            #      MaxOrderNO = '001'
+            # else:
+            #   # 查找倒数三个字符串为订单数字，自动加1
+            #   MaxOrderNO = int(MaxOrderNO[-3:]) + 1
+            #   #不足三位补0
+            #   if (len(str(MaxOrderNO)) == 1):
+            #       MaxOrderNO = '00' + str(MaxOrderNO)
+            #   elif (len(MaxOrderNO) == 2):
+            #       MaxOrderNO = '0' + str(MaxOrderNO)
+            #   else:
+            #       MaxOrderNO = str(MaxOrderNO)
             # OrderNO = 'CGD' + time.strftime("%Y%m%d", time.localtime()) + MaxOrderNO
             OrderNO = generic.getOrderMaxNO('CGD')
             obj.id =  OrderNO
@@ -67,7 +67,7 @@ class ContactAdminPurchase_order(object):
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
     exclude = ('author','price','suppliersid')
-    readonly_fields = ('id','quantity','amount')
+    readonly_fields = ('id',)
     # ordering设置默认排序字段，负号表示降序排序
     ordering = ['-id', ]
     add_form_template = 'PurchaseOrder_form.html'
@@ -131,7 +131,7 @@ class ContactAdminPurchase_order_detail(object):
                     'quantity','price','image_data','remark','author','update_time')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
-    exclude = ('SN','PN','author',)
+    exclude = ('FRU','SN','PN','author',)
     # readonly_fields = ('bill_id', )
     ordering = ['-id', ]
 
@@ -167,10 +167,6 @@ class ContactAdminPurchase_order_detail(object):
     #              'pc_id', 'pc_parent', **{"style": "display:None"}  # 隐藏前面两个字段
     #              ),
     # )
-
-
-
-
     def get_changeform_initial_data(self, request):
         # import datetime
         # begin = datetime.date.today()
@@ -192,22 +188,23 @@ class ContactAdminPurchase_stockin(object):
         request = self.request
         obj.author = str(request.user)
         if flag == 'create':  # 新增默认回填操作员
-            id = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + '%'
-            sql = 'select max(id) from purchase_manage_purchase_stockin where id like "%s"' % id
-            MaxOrderNO = generic.getOrderNO(sql)
-            if not MaxOrderNO:
-                MaxOrderNO = '001'
-            else:
-                # 查找倒数三个字符串为订单数字，自动加1
-                MaxOrderNO = int(MaxOrderNO[-3:]) + 1
-                # 不足三位补0
-                if (len(str(MaxOrderNO)) == 1):
-                    MaxOrderNO = '00' + str(MaxOrderNO)
-                elif (len(MaxOrderNO) == 2):
-                    MaxOrderNO = '0' + str(MaxOrderNO)
-                else:
-                    MaxOrderNO = str(MaxOrderNO)
-            OrderNO = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + MaxOrderNO
+            # id = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + '%'
+            # sql = 'select max(id) from purchase_manage_purchase_stockin where id like "%s"' % id
+            # MaxOrderNO = generic.getOrderNO(sql)
+            # if not MaxOrderNO:
+            #     MaxOrderNO = '001'
+            # else:
+            #     # 查找倒数三个字符串为订单数字，自动加1
+            #     MaxOrderNO = int(MaxOrderNO[-3:]) + 1
+            #     # 不足三位补0
+            #     if (len(str(MaxOrderNO)) == 1):
+            #         MaxOrderNO = '00' + str(MaxOrderNO)
+            #     elif (len(MaxOrderNO) == 2):
+            #         MaxOrderNO = '0' + str(MaxOrderNO)
+            #     else:
+            #         MaxOrderNO = str(MaxOrderNO)
+            # OrderNO = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + MaxOrderNO
+            OrderNO = generic.getOrderMaxNO('CGRK')
             obj.id = OrderNO
             # 获取采购数量和金额
             id = obj.purchase_id_id
@@ -226,8 +223,9 @@ class ContactAdminPurchase_stockin(object):
                   'select id, sn, FRU, PN, useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
                   'from purchase_manage_purchase_order_detail where bill_id_id="%s"' % id
             generic.update(sql)
-            obj.remark = sql
-            obj.save()
+            print(sql)
+            # obj.remark = sql
+            # obj.save()
         else:
             obj.save()
     list_display = ('id','purchase_id','shopid','quantity','price','suppliersid','remark','author','update_time')
@@ -263,29 +261,34 @@ class ContactAdminPurchase_stockin_detail(object):
         if flag == 'create':  # 新增默认回填操作员
             obj.save()
         else:
-            id = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + '%'
-            sql = 'select max(bill_id) from purchase_manage_purchase_stockin_detail where bill_id like "%s"' % id
-            MaxOrderNO = generic.getOrderNO(sql)
-            if not MaxOrderNO:
-                MaxOrderNO = '001'
-            else:
-                # 查找倒数三个字符串为订单数字，自动加1
-                MaxOrderNO = int(MaxOrderNO[-3:]) + 1
-                # 不足三位补0
-                if (len(str(MaxOrderNO)) == 1):
-                    MaxOrderNO = '00' + str(MaxOrderNO)
-                elif (len(MaxOrderNO) == 2):
-                    MaxOrderNO = '0' + str(MaxOrderNO)
-                else:
-                    MaxOrderNO = str(MaxOrderNO)
-            OrderNO = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + MaxOrderNO
+            # id = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + '%'
+            # sql = 'select max(bill_id) from purchase_manage_purchase_stockin_detail where bill_id like "%s"' % id
+            # MaxOrderNO = generic.getOrderNO(sql)
+            # if not MaxOrderNO:
+            #     MaxOrderNO = '001'
+            # else:
+            #     # 查找倒数三个字符串为订单数字，自动加1
+            #     MaxOrderNO = int(MaxOrderNO[-3:]) + 1
+            #     # 不足三位补0
+            #     if (len(str(MaxOrderNO)) == 1):
+            #         MaxOrderNO = '00' + str(MaxOrderNO)
+            #     elif (len(MaxOrderNO) == 2):
+            #         MaxOrderNO = '0' + str(MaxOrderNO)
+            #     else:
+            #         MaxOrderNO = str(MaxOrderNO)
+            # OrderNO = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + MaxOrderNO
+            OrderNO = generic.getOrderMaxNO('CGRK')
             obj.bill_id = OrderNO
             # obj.remark = 'test'
             obj.save()
             # 更新库存数量
             if (obj.quantity > 0) and (obj.bill_id):
-                sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where (FRU=%s or PN=%s) or (machineSN=%s)"
-                params = [obj.quantity, obj.FRU, obj.PN, 'test']
+                if (obj.FRU !='' or obj.PN != ''):
+                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where FRU = %s or PN = %s)"
+                  params = [obj.quantity, obj.FRU, obj.PN]
+                else:
+                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where machineModel = %s"
+                  params = [obj.quantity, obj.machineModel]
                 generic.update(sql, params)
             # 拆分采购入库单
             # 获取采购单号中采购数量
@@ -294,8 +297,10 @@ class ContactAdminPurchase_stockin_detail(object):
             cds1 = generic.query(sql1)
             FRUSelectID = obj.FRUSelect_id
             sql2 = 'select sum(quantity) from purchase_manage_purchase_stockin_detail where FRUSelect_id = "%s"' % FRUSelectID
-            obj.remark = sql1 + '  ，  ' + sql2
-            obj.save()
+            print(sql1)
+            print(sql2)
+            # obj.remark = sql1 + '  ，  ' + sql2
+            # obj.save()
             cds2 = generic.query(sql2)
             quantity = 0
             if cds1 and cds2:
@@ -317,20 +322,21 @@ class ContactAdminPurchase_stockin_detail(object):
                purchase_stockin.shopid_id = obj.shopid_id
                purchase_stockin.FRUSelect_id = obj.FRUSelect_id
                purchase_stockin.save()
-               # 插入出入库报表数据
-               id = obj.bill_id
-               sql = 'insert into report_manage_stock_detail' \
+            # 插入出入库报表数据
+            id = obj.bill_id
+            sql = 'insert into report_manage_stock_detail' \
                      ' (bill_type,bill_id,sn, FRU, PN, price,quantity, useage,source, image,FRUSelect_id, author, remark, location_id,pub_date)' \
                      'select 0,bill_id,sn, FRU, PN, price, quantity, useage,source, image, FRUSelect_id, author, remark, location_id,pub_date ' \
                      'from purchase_manage_purchase_stockin_detail where bill_id="%s"' % id
-               generic.update(sql)
+            print(sql)
+            generic.update(sql)
 
 
     list_display = ('bill_id','purchase_id','shopid','FRUSelect','SN','FRU','PN','desc','source','replace','useage',
                     'price','quantity','location','image_data','remark','author','pub_date')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
-    exclude = ('author',)
+    exclude = ('author','FRU','PN')
     search_fields = ('FRU', 'SN','PN','replace')
     free_query_filter = ['FRU', 'SN', 'PN']
     list_editable = ['location', ]
@@ -338,6 +344,7 @@ class ContactAdminPurchase_stockin_detail(object):
     # show_detail_fields = ['bill_id', 'purchase_id']  # 在指定的字段后添加一个显示数据详情的一个按钮
     list_display_links = ('bill_id', 'purchase_id',)
     date_hierarchy = ['pub_date']
+    readonly_fields = ('bill_id', )
 
     # def get_readonly_fields(self, request, obj=None):
     #     if obj:

@@ -314,6 +314,8 @@ class Repair_use(models.Model):
     FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE,
                                   verbose_name='FRU码 / PN码 / 整机型号')
     PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
+    machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
+    machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
     desc = models.CharField(u'描述', max_length=50, null=True, blank=True)
     source = models.CharField(u'来源', max_length=30, null=True, blank=True)
     replace = models.CharField(u'替代号', max_length=15, null=True, blank=True)
@@ -335,7 +337,7 @@ class Repair_use(models.Model):
     image_data.allow_tags = True
 
     remark = models.TextField(u'备注', null=True, blank=True)
-    pub_date = models.DateTimeField(u'下单时间', auto_now_add=True, null=True)
+    pub_date = models.DateField(u'下单时间', auto_now_add=True, null=True)
     author = models.CharField(u'下单人', max_length=10, default=None)
     update_time = models.DateTimeField(u'修改时间', auto_now=True, null=True)
 
@@ -357,6 +359,8 @@ class Repair_use_stockout(models.Model):
     FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE,
                                   verbose_name='FRU码 / PN码 / 整机型号')
     PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
+    machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
+    machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
     desc = models.CharField(u'描述', max_length=50, null=True, blank=True)
     source = models.CharField(u'来源', max_length=30, null=True, blank=True)
     replace = models.CharField(u'替代号', max_length=15, null=True, blank=True)
@@ -378,7 +382,7 @@ class Repair_use_stockout(models.Model):
     image_data.allow_tags = True
 
     remark = models.TextField(u'备注', null=True, blank=True)
-    pub_date = models.DateTimeField(u'下单时间', auto_now_add=True, null=True)
+    pub_date = models.DateField(u'下单时间', null=True)
     author = models.CharField(u'下单人', max_length=10, default=None)
     update_time = models.DateTimeField(u'修改时间', auto_now=True, null=True)
 

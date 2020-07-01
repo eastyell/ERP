@@ -105,7 +105,7 @@ class ContactAdminDeviceStore(object):
     #     return qs.filter(author=request.user)
 
     # listdisplay设置要显示在列表中的字段（id字段是Django模型的默认主键）
-    list_display = ('shop','FRU','PN','descs','replaces','type','quantity','quantityLock','quantityLover','price','image_data',
+    list_display = ('shop','FRU','PN','machineModel','descs','replaces','type','quantity','quantityLock','quantityLover','price','image_data',
                     'location','source','suppliers','remark','author','update_time')  # list
     # list_display_links，列表时，定制列可以点击跳转。
     list_display_links = ('FRU','PN',)
@@ -127,7 +127,7 @@ class ContactAdminDeviceStore(object):
     # fields，详细页面时，显示字段的字段
     #   fields = ('user',)
     # 添加和修改时那些界面不显示
-    exclude = ('author',)
+    exclude = ('author','machineSN')
     # 详细页面时，M2M显示时，数据移动选择（方向：上下和左右）
     filter_horizontal = ('authors',)  # filter_horizontal 从‘多选框’的形式改变为‘过滤器’的方式，水平排列过滤器，必须是一个 ManyToManyField类型，且不能用于 ForeignKey字段，默认地，管理工具使用`` 下拉框`` 来展现`` 外键`` 字段
     filter_vertical = ("location",)  #同上filter_horizontal，垂直排列过滤器

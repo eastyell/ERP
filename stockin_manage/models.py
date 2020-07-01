@@ -1,3 +1,8 @@
+# 模块名称：其他入库数据模型模块
+# 创建日期：2020-6
+# 最后修改日期：2020-6
+# 作者：Jason
+
 from django.db import models
 from baseinfo_manage.models import Shop
 

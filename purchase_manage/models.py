@@ -44,7 +44,8 @@ class Purchase_order(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.id
+        return '{} / {} / {}'.format(self.id, self.purchase_type, self.desc)
+        # return self.id
 
 # 采购下单明细
 class Purchase_order_detail(models.Model):
@@ -54,6 +55,8 @@ class Purchase_order_detail(models.Model):
     FRU = models.CharField(u'FRU码', max_length=15, null=True, blank=True)
     FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE, verbose_name='FRU码 / PN码 / 整机型号')
     PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
+    machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
+    machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
     desc = models.CharField(u'描述', max_length=50, null=True, blank=True)
     source = models.CharField(u'来源', max_length=30, null=True, blank=True)
     replace = models.CharField(u'替代号', max_length=15, null=True, blank=True)
@@ -143,6 +146,8 @@ class Purchase_stockin_detail(models.Model):
     FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE,
                                   verbose_name='FRU码 / PN码 / 整机型号')
     PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
+    machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
+    machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
     desc = models.CharField(u'描述', max_length=50, null=True, blank=True)
     source = models.CharField(u'来源', max_length=30, null=True, blank=True)
     replace = models.CharField(u'替代号', max_length=15, null=True, blank=True)
