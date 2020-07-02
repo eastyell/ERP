@@ -1,0 +1,11 @@
+:安装系统依赖的库文件
+:pip install -r requirements.txt
+python -m pip install --upgrade pip
+cd \packed\Django-2.0.13
+python setup.py install
+pip install pymysql
+pip install pytz
+pip install  \packed\xadmin-django2.zip
+pip install -i https://pypi.doubanio.com/simple/ --trusted-host pypi.doubanio.com pillow
+
+
