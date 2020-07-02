@@ -460,7 +460,7 @@ class ContactAdminRepair_use_stockout(object):
             obj.save()
             # 更新库存数量
             if (obj.quantity != 0) and (obj.billid):
-                if (obj.machineModel or obj.machineModel != ''):
+                if (obj.machineModel and obj.machineModel.strip() != ''):
                   sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where machineModel = %s"
                   params = [obj.quantity, obj.machineModel]
                 else:

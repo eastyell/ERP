@@ -283,7 +283,8 @@ class ContactAdminPurchase_stockin_detail(object):
             obj.save()
             # 更新库存数量
             if (obj.quantity > 0) and (obj.bill_id):
-                if (obj.machineModel or obj.machineModel != ''):
+                print(obj.machineModel)
+                if (obj.machineModel and obj.machineModel.strip() != ''):
                   sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where machineModel = %s"
                   params = [obj.quantity, obj.machineModel]
                 else:
@@ -298,7 +299,8 @@ class ContactAdminPurchase_stockin_detail(object):
             sql1 = 'select quantity from purchase_manage_purchase_order_detail where id= "%s"' % id
             cds1 = generic.query(sql1)
             FRUSelectID = obj.FRUSelect_id
-            sql2 = 'select sum(quantity) from purchase_manage_purchase_stockin_detail where FRUSelect_id = "%s"' % FRUSelectID
+            Fpurchase_id = obj.purchase_id_id
+            sql2 = 'select sum(quantity) from purchase_manage_purchase_stockin_detail where (FRUSelect_id = "%s" and purchase_id_id =  "%s")' % (FRUSelectID,Fpurchase_id)
             print(sql1)
             print(sql2)
             # obj.remark = sql1 + '  ，  ' + sql2
@@ -338,7 +340,7 @@ class ContactAdminPurchase_stockin_detail(object):
                     'price','quantity','location','image_data','remark','author','pub_date')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
-    exclude = ('author','FRU','PN')
+    exclude = ('author','FRU','PN','machineModel')
     search_fields = ('FRU', 'SN','PN','replace')
     free_query_filter = ['FRU', 'SN', 'PN']
     list_editable = ['location', ]
@@ -347,6 +349,16 @@ class ContactAdminPurchase_stockin_detail(object):
     list_display_links = ('bill_id', 'purchase_id',)
     date_hierarchy = ['pub_date']
     readonly_fields = ('bill_id', )
+
+    # def get_form(self, request, obj=None, **kwargs):
+    #     self.exclude = []
+    #     if not request.user.is_superuser:
+    #         self.exclude.append('id')
+    #     if not obj.machineModel:
+    #         self.exclude.append('machineSN')
+    #     print('test')
+    #     print(obj.machineModel)
+    #     return super(ContactAdminPurchase_stockin_detail, self).get_form(request, obj, **kwargs)
 
     # def get_readonly_fields(self, request, obj=None):
     #     if obj:
