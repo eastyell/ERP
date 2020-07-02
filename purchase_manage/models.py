@@ -44,7 +44,7 @@ class Purchase_order(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return '{} / {} / {}'.format(self.id, self.purchase_type, self.desc)
+        return '{} / {} / {}'.format(self.id, self.purchase_type, self.shopid)
         # return self.id
 
 # 采购下单明细
@@ -141,7 +141,7 @@ class Purchase_stockin_detail(models.Model):
     bill_id = models.CharField('采购入库单号', max_length=30, null=True, blank=True)
     purchase_id = models.ForeignKey(Purchase_order_detail, to_field='id', on_delete=models.CASCADE, verbose_name='采购单号', default=1)
     shopid = models.ForeignKey(Shop, to_field='id', on_delete=models.CASCADE, verbose_name='商品名称')
-    SN = models.CharField(u'SN码', max_length=15, null=True, )
+    SN = models.CharField(u'SN码', max_length=15, null=True, blank=True )
     FRU = models.CharField(u'FRU码', max_length=15, null=True, )
     FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE,
                                   verbose_name='FRU码 / PN码 / 整机型号')

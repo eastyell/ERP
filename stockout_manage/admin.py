@@ -423,12 +423,14 @@ class ContactAdminRepair_usel(object):
             obj.desc = cds[0][6]
             obj.replace = cds[0][7]
             obj.source = cds[0][8]
+            if obj.quantity > 0 :
+                obj.quantity = -obj.quantity
             obj.save()
             # 保存维修领用下单后，自动生成维修领用下单入库信息
             id = obj.id
             sql = 'insert into stockout_manage_repair_use_stockout' \
-                  ' (repairid_id, sn, FRU, PN, useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id)' \
-                  'select id, sn, FRU, PN, useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
+                  ' (repairid_id, sn, FRU, PN, machineModel,useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id)' \
+                  'select id, sn, FRU, PN, machineModel,useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
                   'from stockout_manage_repair_use where id="%s"' % id
             generic.update(sql)
             print(sql)
@@ -437,7 +439,7 @@ class ContactAdminRepair_usel(object):
         else:
             obj.save()
 
-    exclude = ('author', 'id','SN','FRU','PN' )
+    exclude = ('author', 'id','SN','FRU','PN','machineSN','machineModel' )
 
     list_display = ('id', 'shopid', 'SN','FRU','FRUSelect','PN','desc','source','replace',
                     'quantity', 'price','image_data','remark', 'pub_date', 'author')
@@ -458,21 +460,23 @@ class ContactAdminRepair_use_stockout(object):
             obj.save()
             # 更新库存数量
             if (obj.quantity != 0) and (obj.billid):
-                if (obj.FRU != '' or obj.PN != ''):
-                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where FRU = %s or PN = %s)"
-                  params = [obj.quantity, obj.FRU, obj.PN]
-                else:
+                if (obj.machineModel or obj.machineModel != ''):
                   sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where machineModel = %s"
                   params = [obj.quantity, obj.machineModel]
+                else:
+                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where FRU = %s or PN = %s"
+                  params = [obj.quantity, obj.FRU, obj.PN]
+                print(params)
+                print(sql)
                 generic.update(sql, params)
                 print(sql)
                 print(params)
                 # 插入出入库报表数据
-                id = obj.billid
+                id = obj.id
                 sql = 'insert into report_manage_stock_detail' \
                       ' (bill_type,bill_id,sn, FRU, PN, price,quantity, useage,source, image,FRUSelect_id, author, remark, location_id,pub_date)' \
                       'select 6,billid,sn, FRU, PN, price, quantity, useage,source, image, FRUSelect_id, author, remark, location_id,pub_date ' \
-                      'from stockout_manage_repair_use_stockout where billid="%s"' % id
+                      'from stockout_manage_repair_use_stockout where id="%s"' % id
                 generic.update(sql)
                 print(sql)
 
@@ -480,7 +484,7 @@ class ContactAdminRepair_use_stockout(object):
                     'quantity', 'price', 'image_data', 'remark', 'pub_date', 'author')
     list_display_links = ['repairid']
     # 添加和修改时那些界面不显示
-    exclude = ('author','FRU','PN',)
+    exclude = ('author','FRU','PN','machineModel')
     readonly_fields = ('billid','repairid')
 
 # Register your models here.

@@ -219,8 +219,8 @@ class ContactAdminPurchase_stockin(object):
             #通过采购单号获取采购信息
             id = obj.purchase_id_id
             sql = 'insert into purchase_manage_purchase_stockin_detail' \
-                  ' (purchase_id_id, sn, FRU, PN, useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id)' \
-                  'select id, sn, FRU, PN, useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
+                  ' (purchase_id_id, sn, FRU, PN, machineModel,machineSN,useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id)' \
+                  'select id, sn, FRU, PN, machineModel,machineSN,useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
                   'from purchase_manage_purchase_order_detail where bill_id_id="%s"' % id
             generic.update(sql)
             print(sql)
@@ -283,12 +283,14 @@ class ContactAdminPurchase_stockin_detail(object):
             obj.save()
             # 更新库存数量
             if (obj.quantity > 0) and (obj.bill_id):
-                if (obj.FRU !='' or obj.PN != ''):
-                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where FRU = %s or PN = %s)"
-                  params = [obj.quantity, obj.FRU, obj.PN]
-                else:
+                if (obj.machineModel or obj.machineModel != ''):
                   sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where machineModel = %s"
                   params = [obj.quantity, obj.machineModel]
+                else:
+                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where FRU = %s or PN = %s"
+                  params = [obj.quantity, obj.FRU, obj.PN]
+                print(params)
+                print(sql)
                 generic.update(sql, params)
             # 拆分采购入库单
             # 获取采购单号中采购数量
@@ -323,16 +325,16 @@ class ContactAdminPurchase_stockin_detail(object):
                purchase_stockin.FRUSelect_id = obj.FRUSelect_id
                purchase_stockin.save()
             # 插入出入库报表数据
-            id = obj.bill_id
+            id = obj.id
             sql = 'insert into report_manage_stock_detail' \
                      ' (bill_type,bill_id,sn, FRU, PN, price,quantity, useage,source, image,FRUSelect_id, author, remark, location_id,pub_date)' \
                      'select 0,bill_id,sn, FRU, PN, price, quantity, useage,source, image, FRUSelect_id, author, remark, location_id,pub_date ' \
-                     'from purchase_manage_purchase_stockin_detail where bill_id="%s"' % id
+                     'from purchase_manage_purchase_stockin_detail where id ="%s"' % id
             print(sql)
             generic.update(sql)
 
 
-    list_display = ('bill_id','purchase_id','shopid','FRUSelect','SN','FRU','PN','desc','source','replace','useage',
+    list_display = ('bill_id','purchase_id','shopid','FRUSelect','SN','FRU','PN','machineSN','desc','source','replace','useage',
                     'price','quantity','location','image_data','remark','author','pub_date')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示

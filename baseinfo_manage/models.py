@@ -64,7 +64,7 @@ class DeviceStores(models.Model):
     machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
     descs = models.CharField(u'描述', max_length=50, null=True, blank=True)
     price = models.FloatField(u'单价', default=0)
-    quantity = models.IntegerField(u'数量', default=0)
+    quantity = models.IntegerField(u'库存数量', default=0)
     quantityLock = models.IntegerField(u'锁定数量', default=0)
     quantityLover = models.IntegerField(u'最低库存', default=0)
     type = models.IntegerField(verbose_name=("备件类别"), choices=const.device_type, default=1)

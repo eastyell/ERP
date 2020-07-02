@@ -309,10 +309,10 @@ class Device_lend_stockout(models.Model):
 class Repair_use(models.Model):
     id = models.CharField('维修领用单号', primary_key= True, max_length=30)
     shopid = models.ForeignKey(Shop, to_field='id', on_delete=models.CASCADE, verbose_name='商品名称')
-    SN = models.CharField(u'SN码', max_length=15, null=True, blank=True)
-    FRU = models.CharField(u'FRU码', max_length=15, null=True, blank=True)
     FRUSelect = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE,
                                   verbose_name='FRU码 / PN码 / 整机型号')
+    SN = models.CharField(u'SN码', max_length=15, null=True, blank=True)
+    FRU = models.CharField(u'FRU码', max_length=15, null=True, blank=True)
     PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
     machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
     machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
