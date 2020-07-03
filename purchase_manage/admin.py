@@ -134,7 +134,7 @@ class ContactAdminPurchase_order_detail(object):
                     'quantity','price','image_data','remark','author','update_time')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
-    exclude = ('FRU','SN','PN','author',)
+    exclude = ('FRU','SN','PN','machineSN','author',)
     # readonly_fields = ('bill_id', )
     ordering = ['-id', ]
 

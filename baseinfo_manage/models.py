@@ -89,7 +89,7 @@ class DeviceStores(models.Model):
     def __str__(self):
         # return "标题:{},字数:{},概要:{}".format(self.title, len(self.content), self.content[:18])
         #   return self.remark[:30] + '...'
-        return '{} / {} / {}'.format(self.FRU, self.PN, self.machineModel)
+        return '{} / {} / {} / {}'.format(self.shop, self.FRU, self.PN, self.machineModel)
         # return self.PN
 
     class Meta:
