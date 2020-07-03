@@ -461,7 +461,7 @@ class ContactAdminRequirement(object):
     # 详细时间分层筛选
     # date_hierarchy = 'pub_date'
     # 添加和修改时那些界面不显示
-    #exclude = ('author','pub_date')
+    exclude = ('author',)
     # 设置哪些字段可以点击进入编辑界面
     # 指定列表显示的哪列可以点击跳转到详情更新页
     list_display_links = ('pub_date', 'desc')

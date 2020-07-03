@@ -63,6 +63,9 @@ class ContactAdminPurchase_order(object):
         else:
             obj.save()
 
+    # 后台自定义不是下拉选择框，而是搜索框
+    # 下拉式可选，在外键对应的字段的adminx.py
+    relfield_style = 'fk-ajax'
     list_display = ('id','purchase_type','shopid','desc','quantity','amount','remark','author','update_time')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示

@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 from crm.settings import MEDIA_URL
 from params_manage.models import Location
 from common import generic
+import django.utils.timezone as timezone
 
 
 # 自定义采购下单
@@ -40,11 +41,11 @@ class Purchase_order(models.Model):
 
     # 下面为新增代码
     class Meta:
-        verbose_name = '采购单'
+        verbose_name = '采购申请'
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return '{} / {} / {}'.format(self.id, self.purchase_type, self.shopid)
+        return '{} / {} / {} / {}'.format(self.id, self.purchase_type, self.shopid, self.desc)
         # return self.id
 
 # 采购下单明细
@@ -167,7 +168,7 @@ class Purchase_stockin_detail(models.Model):
     image_data.allow_tags = True
 
     remark = models.TextField(u'备注', null=True, blank=True)
-    pub_date = models.DateField(u'入库时间', null=True)
+    pub_date = models.DateField(u'入库时间', default = timezone.now)
     author = models.CharField(u'入库人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
