@@ -31,7 +31,7 @@ class ContactAdminPurchase_order_self(object):
 
         return context
 
-#采购单
+#采购申请
 class ContactAdminPurchase_order(object):
     def save_models(self):
         obj = self.new_obj
@@ -66,15 +66,17 @@ class ContactAdminPurchase_order(object):
     # 后台自定义不是下拉选择框，而是搜索框
     # 下拉式可选，在外键对应的字段的adminx.py
     relfield_style = 'fk-ajax'
-    list_display = ('id','purchase_type','shopid','desc','quantity','amount','remark','author','update_time')
+    list_display = ('id','purchase_type','ifimportant','shopid','desc','quantity','amount','remark','author','update_time')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
-    exclude = ('author','price','suppliersid')
+    exclude = ('author','price','suppliersid','machineSelect')
     readonly_fields = ('id',)
     # ordering设置默认排序字段，负号表示降序排序
     ordering = ['-id', ]
     add_form_template = 'PurchaseOrder_form.html'
     change_form_template = 'PurchaseOrder_form.html'
+    # 多选样式
+    style_fields = {'machineSelect': 'm2m_transfer'}
 
 #采购下单
 class ContactAdminPurchase_order_detail(object):
@@ -130,13 +132,18 @@ class ContactAdminPurchase_order_detail(object):
             # purchase_stockin.save()
         else:
             obj.save()
-    list_display = ('bill_id','shopid','FRUSelect','desc','source','replace','useage',
+    list_display = ('bill_id','ifmachine','shopid','machineSelect','desc','source','replace','useage',
                     'quantity','price','image_data','remark','author','update_time')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
-    exclude = ('FRU','SN','PN','machineSN','author',)
+    exclude = ('FRUSelect','FRU','SN','PN','machineSN','machineModel','author',)
+    # 多选样式
+    style_fields = {'machineSelect': 'm2m_transfer'}
     # readonly_fields = ('bill_id', )
-    ordering = ['-id', ]
+    # ordering = ['-id', ]
+
+    def get_queryset(self, request):
+        return DeviceStores.objects.filter(shop_id=Purchase_order_detail.shopid)
 
     # def get_readonly_fields(self, request, obj=None):
     #     fields = []
@@ -207,7 +214,7 @@ class ContactAdminPurchase_stockin(object):
             #     else:
             #         MaxOrderNO = str(MaxOrderNO)
             # OrderNO = 'CGRK' + time.strftime("%Y%m%d", time.localtime()) + MaxOrderNO
-            OrderNO = generic.getOrderMaxNO('CGRK')
+            OrderNO = generic.getOrderMaxNO('CGRKSQ')
             obj.id = OrderNO
             # 获取采购数量和金额
             id = obj.purchase_id_id
@@ -221,10 +228,15 @@ class ContactAdminPurchase_stockin(object):
             # 保存采购入库单后，采购入库自动生成采购下单明细
             #通过采购单号获取采购信息
             id = obj.purchase_id_id
+            # sql = 'insert into purchase_manage_purchase_stockin_detail' \
+            #       ' (purchase_id_id, sn, FRU, PN, machineModel,machineSN,useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id)' \
+            #       'select id, sn, FRU, PN, machineModel,machineSN,useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
+            #       'from purchase_manage_purchase_order_detail where bill_id_id="%s"' % id
             sql = 'insert into purchase_manage_purchase_stockin_detail' \
-                  ' (purchase_id_id, sn, FRU, PN, machineModel,machineSN,useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id)' \
-                  'select id, sn, FRU, PN, machineModel,machineSN,useage, price, quantity, source, image, author, remark, 1, shopid_id, FRUSelect_id ' \
-                  'from purchase_manage_purchase_order_detail where bill_id_id="%s"' % id
+                  ' (purchase_id_id, FRU, PN, machineModel,machineSN,useage, price, quantity, source, image, author, remark, location_id, shopid_id,FRUSelect_id,pub_date) ' \
+                  'select a.id, c.FRU, c.PN, c.machineModel,c.machineSN,a.useage, a.price, a.quantity, a.source, a.image, a.author, a.remark, 1, c.shop_id, c.id, "1919-01-01" ' \
+                  'from purchase_manage_purchase_order_detail a,purchase_manage_purchase_order_detail_machineSelect b, baseinfo_manage_devicestores c ' \
+                  'where  a.id = b.purchase_order_detail_id and b.devicestores_id = c.id and a.bill_id_id="%s"' % id
             generic.update(sql)
             print(sql)
             # obj.remark = sql
@@ -288,8 +300,8 @@ class ContactAdminPurchase_stockin_detail(object):
             if (obj.quantity > 0) and (obj.bill_id):
                 print(obj.machineModel)
                 if (obj.machineModel and obj.machineModel.strip() != ''):
-                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where machineModel = %s"
-                  params = [obj.quantity, obj.machineModel]
+                  sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where machineModel = %s and (FRU = %s or PN = %s) "
+                  params = [obj.quantity, obj.machineModel, obj.FRU, obj.PN]
                 else:
                   sql = "UPDATE baseinfo_manage_devicestores SET quantity = quantity + %s where FRU = %s or PN = %s"
                   params = [obj.quantity, obj.FRU, obj.PN]
@@ -339,8 +351,8 @@ class ContactAdminPurchase_stockin_detail(object):
             generic.update(sql)
 
 
-    list_display = ('bill_id','purchase_id','shopid','FRUSelect','SN','FRU','PN','machineSN','desc','source','replace','useage',
-                    'price','quantity','location','image_data','remark','author','pub_date')
+    list_display = ('bill_id','purchase_id','shopid','FRUSelect','SN','FRU','PN','machineSN','desc','source','replace', 'quantity','price','useage',
+                   'location','image_data','remark','author','pub_date')
     model_icon = 'fa fa-exchange'  # 图标样式
     # 添加和修改时那些界面不显示
     exclude = ('author','FRU','PN','machineModel')
@@ -349,7 +361,7 @@ class ContactAdminPurchase_stockin_detail(object):
     list_editable = ['location', ]
     list_filter = ('FRU', 'SN', 'PN', 'location','replace')
     # show_detail_fields = ['bill_id', 'purchase_id']  # 在指定的字段后添加一个显示数据详情的一个按钮
-    list_display_links = ('bill_id', 'purchase_id',)
+    list_display_links = ('bill_id', 'purchase_id', 'FRUSelect')
     date_hierarchy = ['pub_date']
     readonly_fields = ('bill_id', )
 

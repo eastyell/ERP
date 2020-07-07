@@ -57,10 +57,11 @@ class Suppliers(models.Model):
 
 # 库存信息
 class DeviceStores(models.Model):
+    ifmachine = models.IntegerField(verbose_name=("是否整机备件"), choices=const.virtual_choice, default=0)
+    machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, verbose_name='商品名称', default='1')
     FRU = models.CharField(u'FRU码', max_length=15,null=True, blank=True )
     PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
-    machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
     machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
     descs = models.CharField(u'描述', max_length=50, null=True, blank=True)
     price = models.FloatField(u'单价', default=0)
@@ -89,7 +90,7 @@ class DeviceStores(models.Model):
     def __str__(self):
         # return "标题:{},字数:{},概要:{}".format(self.title, len(self.content), self.content[:18])
         #   return self.remark[:30] + '...'
-        return '{} / {} / {} / {}'.format(self.shop, self.FRU, self.PN, self.machineModel)
+        return '{} / {} / {} / {}'.format(self.machineModel, self.shop, self.FRU, self.PN)
         # return self.PN
 
     class Meta:

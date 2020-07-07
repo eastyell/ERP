@@ -56,24 +56,31 @@ def getOrderMaxNO(orderType):
     cursor = connection.cursor()
     with transaction.atomic():
       try:
+        filedid = 'id'
         id = orderType.upper() + time.strftime("%Y%m%d", time.localtime()) + '%'
         if (orderType.upper()=='CGD'):
            tableName = 'purchase_manage_purchase_order'
+        elif (orderType.upper() == 'CGRKSQ'):
+           tableName = 'purchase_manage_purchase_stockin'
         elif (orderType.upper() == 'CGRK'):
-            tableName = 'purchase_manage_purchase_stockin'
+           tableName = 'purchase_manage_purchase_stockin_detail'
+           filedid = 'bill_id'
         elif (orderType.upper() == 'WXLY'):
-            tableName = 'stockout_manage_repair_use'
+           tableName = 'stockout_manage_repair_use'
         elif (orderType.upper()=='WXLYCK'):
            tableName = 'stockout_manage_repair_use_stockout'
-        sql = 'select max(id) from %s where id like "%s"' %(tableName,id)
+        sql = 'select max(%s) from %s where  %s  like "%s"' %(filedid,tableName,filedid,id)
+        print(sql)
         cursor.execute(sql)
         maxid = cursor.fetchone()
         MaxOrderNO = maxid[0]
+        print(MaxOrderNO)
         if not MaxOrderNO:
            MaxOrderNO = '001'
         else:
            # 查找倒数三个字符串为订单数字，自动加1
            MaxOrderNO = int(MaxOrderNO[-3:]) + 1
+           print(MaxOrderNO)
            #不足三位补0
            if (len(str(MaxOrderNO)) == 1):
                MaxOrderNO = '00' + str(MaxOrderNO)

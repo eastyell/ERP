@@ -105,13 +105,13 @@ class ContactAdminDeviceStore(object):
     #     return qs.filter(author=request.user)
 
     # listdisplay设置要显示在列表中的字段（id字段是Django模型的默认主键）
-    list_display = ('shop','FRU','PN','machineModel','descs','replaces','type','quantity','quantityLock','quantityLover','price','image_data',
+    list_display = ('ifmachine','machineModel','shop','FRU','PN','descs','replaces','type','quantity','quantityLock','quantityLover','price','image_data',
                     'location','source','suppliers','remark','author','update_time')  # list
     # list_display_links，列表时，定制列可以点击跳转。
     list_display_links = ('FRU','PN',)
-    search_fields = ('FRU','PN')  # 如果只有一个值，结尾必须有一个逗号，证明是list或元组
+    search_fields = ('ifmachine','FRU','PN')  # 如果只有一个值，结尾必须有一个逗号，证明是list或元组
     # search_name = {'FRU查询':'FRU','SN查询':'SN'}
-    free_query_filter = ['FRU','PN']
+    free_query_filter = ['ifmachine','FRU','PN']
     # list_per_page设置每页显示多少条记录，默认是100条
     list_per_page = 5
     # ordering设置默认排序字段，负号表示降序排序
@@ -119,7 +119,7 @@ class ContactAdminDeviceStore(object):
     # list_editable 设置默认可编辑字段,第一个字段不允许编辑
     # list_editable = ['location', ]
     # 设置过滤
-    list_filter = ('FRU','PN','location',)
+    list_filter = ('ifmachine','machineModel','FRU','PN','location',)
     # fk_fields 设置显示外键字段
     # fk_fields = ('machine_room_id',)
     # 详细时间分层筛选
