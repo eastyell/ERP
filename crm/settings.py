@@ -27,6 +27,8 @@ MEDIA_URL = '/media/'
 # 这里特意写成 upload 和 media，而不是统一写成 media 或 upload，是为了便于理解 MEDIA_ROOT 和 MEDIA_URL 的作用和区别
 TEMPLATES_ROOT  = os.path.join(BASE_DIR, 'templates')
 
+TEMPLATES_RPT = os.path.join(BASE_DIR, 'report_manage\\templates')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'reversion',
     'xadmin',
+    # 'notifications',  #发送通知
     'stockin_manage',   # 入库模块
     'stockout_manage',   # 出库模块
     'store_manage', # 库存管理
@@ -59,6 +62,7 @@ INSTALLED_APPS = [
     'report_manage', # 报表模块
     'baseinfo_manage', # 基础资料
     'params_manage',  # 参数模块
+    'assets_manage',  # 资产模块
 
 
     # 'crm.templates',
@@ -115,6 +119,11 @@ DATABASES = {
     }
 }
 
+{
+  "index" : {
+  "refresh_interval" : "1s"
+  }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -146,7 +155,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

@@ -6,19 +6,18 @@
 from django.db import models
 from django.utils.safestring import mark_safe
 from crm.settings import MEDIA_URL
-from params_manage.models import Customer_type,Base_type,\
-    Base_level,Base_brand,Base_brand_child,Location
+from params_manage.models import *
 from common import const
+from common import generic
 
-# 商品信息
+# 备件信息
 class Shop(models.Model):
-     id = models.CharField(u'商品代码', primary_key= True, max_length=30, )
-     name = models.CharField(u'商品名称', max_length=30, null=True, blank=True )
-     shop_type = models.ForeignKey(Base_type, on_delete=models.CASCADE, verbose_name='商品类别', default='1')
-     shop_level = models.ForeignKey(Base_level, on_delete=models.CASCADE, verbose_name='商品等级', default='1')
-     shop_brand = models.ForeignKey(Base_brand, on_delete=models.CASCADE, verbose_name='商品品牌', default='1')
-     # shop_brand_childs = models.ForeignKey(Base_brand_child, on_delete=models.CASCADE, verbose_name='商品子品牌', default='1')
-     status = models.CharField(u'商品状态', max_length=30, null=True, blank=True)
+     name = models.CharField(u'备件名称', max_length=30, null=True, blank=True )
+     shop_type = models.ForeignKey(Base_type, on_delete=models.CASCADE, verbose_name='备件类别', default='1')
+     shop_level = models.ForeignKey(Base_level, on_delete=models.CASCADE, verbose_name='备件等级', default='1')
+     shop_brand = models.ForeignKey(Base_brand, on_delete=models.CASCADE, verbose_name='备件品牌', default='1')
+     # shop_brand_childs = models.ForeignKey(Base_brand_child, on_delete=models.CASCADE, verbose_name='备件子品牌', default='1')
+     status = models.CharField(u'备件状态', max_length=30, null=True, blank=True)
      cost = models.FloatField(u'采购成本',default=0)
      useage = models.IntegerField(u'使用年限',default=0)
      quantity_good = models.IntegerField(u'最佳备货量',default=0)
@@ -30,11 +29,12 @@ class Shop(models.Model):
 
      # 列表中显示的内容
      def __str__(self):
-        return self.name
+        return '{} / {}'.format(self.shop_type, self.shop_brand)
 
      class Meta:
-         verbose_name_plural = '商品信息'
-         verbose_name = '商品信息'
+         verbose_name_plural = '备件类别'
+         verbose_name = '备件类别'
+         ordering = ('shop_type', )
 
 # 供应商信息
 class Suppliers(models.Model):
@@ -55,15 +55,18 @@ class Suppliers(models.Model):
         verbose_name_plural = '供应商信息'
         verbose_name = '供应商信息'
 
-# 库存信息
+# 备件明细
 class DeviceStores(models.Model):
     ifmachine = models.IntegerField(verbose_name=("是否整机备件"), choices=const.virtual_choice, default=0)
     machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, verbose_name='商品名称', default='1')
+    machineModels = models.ForeignKey(Device_kind, on_delete=models.CASCADE, verbose_name='整机型号', default='1')
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, verbose_name='备件类别', default='1')
+    FRUS = models.ForeignKey(Device_FRU, on_delete=models.CASCADE, verbose_name='FRU码 / 描述', default='1')
     FRU = models.CharField(u'FRU码', max_length=15,null=True, blank=True )
     PN = models.CharField(u'PN码', max_length=15, null=True, blank=True)
+    replaces = models.CharField(u'替代号', max_length=15, null=True, blank=True)
     machineSN = models.CharField(u'整机SN', max_length=30, null=True, blank=True)
-    descs = models.CharField(u'描述', max_length=50, null=True, blank=True)
+    descs = models.CharField(u'备件描述', max_length=50, null=True, blank=True)
     price = models.FloatField(u'单价', default=0)
     quantity = models.IntegerField(u'库存数量', default=0)
     quantityLock = models.IntegerField(u'锁定数量', default=0)
@@ -71,11 +74,20 @@ class DeviceStores(models.Model):
     type = models.IntegerField(verbose_name=("备件类别"), choices=const.device_type, default=1)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name='库存位置', default='1')
     source = models.CharField(u'来源', max_length=30, null=True, blank=True)
-    replaces = models.CharField(u'替代号', max_length=15, null=True, blank=True)
-    suppliers = models.ForeignKey(Suppliers, on_delete=models.CASCADE, verbose_name='首选供应商')
-    remark = models.TextField(u'备注', null=True, blank=True)
+    suppliers = models.ForeignKey(Suppliers, on_delete=models.CASCADE, verbose_name='首选供应商', default='1')
     author = models.CharField(u'操作人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    qrcode = models.ImageField(u'备件二维码', upload_to='images/%m%d', null=True, blank=True, )
+    def qrcode_data(self):
+        if self.qrcode != '':
+            return mark_safe(
+                '<a href="%s%s" target="blank" title="备件二维码预览"> <img src="%s%s" height="50" width="50"/> </a>' % (
+                MEDIA_URL, self.qrcode, MEDIA_URL, self.qrcode,))
+        else:
+            return ''
+    qrcode_data.short_description = u'备件二维码'
+    qrcode_data.allow_tags = True
+
     image = models.ImageField(u'图片', upload_to='images/%m%d', null=True, blank=True, )
     def image_data(self):
         if self.image != '':
@@ -85,17 +97,55 @@ class DeviceStores(models.Model):
     image_data.short_description = u'图片'
     image_data.allow_tags = True
 
+    remark = models.TextField(u'备注', null=True, blank=True)
+
+    def quantitys(self):
+        id = self.id
+        # fru = self.id
+        # pn = self.PN
+        # print(self.machineModel)
+        # if (not self.machineModel) and (self.machineModel != None):
+        #   sql = 'select sum(quantity) from report_manage_stock_detail where fru = "%s" or PN = "%s"' %(fru,pn)
+        # else:
+        #   sql = 'select sum(quantity) from report_manage_stock_detail where fru = "%s" or PN = "%s"' %(fru,pn)
+        # print(sql)
+        sql = 'select sum(quantity) from report_manage_stock_detail where FRUSelect_id = "%s"' %id
+        print(sql)
+        cds = generic.query(sql)
+        if cds:
+           if cds[0][0] != None:
+             return  cds[0][0]
+           else: return '0'
+        else: return '0'
+    quantitys.short_description = u'库存量'
+    quantitys.allow_tags = True
+
     # update_time.editable = True
     # 列表中显示的内容
     def __str__(self):
         # return "标题:{},字数:{},概要:{}".format(self.title, len(self.content), self.content[:18])
         #   return self.remark[:30] + '...'
-        return '{} / {} / {} / {}'.format(self.machineModel, self.shop, self.FRU, self.PN)
-        # return self.PN
+        return '{} | {} | {} | {} | {}'.format(self.machineModels, self.shop, self.FRUS, str(self.PN), str(self.quantitys()))
 
     class Meta:
-        verbose_name_plural = '库存信息'
-        verbose_name = '库存信息'
+        verbose_name_plural = '备件明细'
+        verbose_name = '备件明细'
+        ordering = ('shop','machineModels','FRUS')
+
+# 备件选择历史信息
+class SelectOrderDetail(models.Model):
+    shopid = models.ForeignKey(Shop, to_field='id', on_delete=models.CASCADE, verbose_name='备件类别', default=1)
+    device = models.ForeignKey(DeviceStores, to_field='id', on_delete=models.CASCADE, verbose_name='整机型号 | 备件类别 | FRU码 | PN码 | 库存量', default= 1)
+    desc = models.CharField('备件描述', max_length=50, null=True, blank=True)
+    quantity = models.IntegerField('申请数量', null=True, blank=True, default=1)
+
+    class Meta:
+        verbose_name = '备件申请信息'
+        verbose_name_plural = verbose_name
+        ordering = ['device']
+
+    def __str__(self):
+        return '{} | {} | {}'.format(self.device, str(self.quantity),self.desc )
 
 # 客户信息
 class Customers(models.Model):
@@ -128,7 +178,7 @@ class CustomersLatent(models.Model):
      customer = models.ForeignKey(Customers, on_delete=models.CASCADE, verbose_name='客户名称')
      item = models.CharField(u'追踪项目', max_length=100, null=True, blank=True)
      rate = models.TextField(u'追踪进展', null=True, blank=True)
-     status = models.IntegerField(verbose_name=("状态"), choices=const.customersLatent_status, default=1)
+     status = models.IntegerField(verbose_name=("状态"), choices=const.customersLatent_status, default=0)
      remark = models.TextField(u'备注', null=True, blank=True)
      author = models.CharField(u'操作人', max_length=10, default=None)
      update_time = models.DateTimeField(u'更新时间', auto_now=True)
@@ -152,7 +202,7 @@ class CustomersSign(models.Model):
      engineer = models.CharField(u'负责工程师', max_length=30, )
      # contents = models.ForeignKey(ContractContent, on_delete=models.CASCADE, verbose_name='服务内容')
      contents = models.TextField(u'服务内容', null=True, blank=True)
-     status = models.IntegerField(verbose_name=("项目状态"), choices=const.customersSign_status, default=1)
+     status = models.IntegerField(verbose_name=("项目状态"), choices=const.customersSign_status, default=0)
      # rptservice = models.TextField(u'客户服务报告', null=True, blank=True)
      rptservice = models.FileField(u'客户服务报告', upload_to='files/%m%d', null=True, blank=True)
      def file_data(self):
@@ -169,7 +219,7 @@ class CustomersSign(models.Model):
      update_time = models.DateTimeField(u'更新时间', auto_now=True)
      # 列表中显示的内容
      def __str__(self):
-        return self.contractid
+        return str(self.customer)
 
      class Meta:
          verbose_name_plural = '签约客户'

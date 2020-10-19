@@ -85,16 +85,17 @@ class Purchase_type(models.Model):
     def __str__(self):
         return self.type
 
-# 备件类型
+# 整机类型
 class Device_kind(models.Model):
     name = models.CharField('类型名称', max_length=20)
+    desc = models.CharField('描述信息', max_length=30, default='')
     pub_date = models.DateField(u'创建时间', auto_now_add=True)
     author = models.CharField(u'操作人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     # 下面为新增代码
     class Meta:
-        verbose_name = '备件类型'
+        verbose_name = '整机类型'
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -115,61 +116,78 @@ class Device_type(models.Model):
     def __str__(self):
         return self.name
 
-# 商品类别
+# FRU信息
+class Device_FRU(models.Model):
+    name = models.CharField(u'FRU', max_length=20)
+    desc = models.CharField('描述信息', max_length=30, default='')
+    pub_date = models.DateField(u'创建时间', auto_now_add=True)
+    author = models.CharField(u'操作人', max_length=10, default=None)
+    update_time = models.DateTimeField(u'更新时间', auto_now=True)
+
+    # 下面为新增代码
+    class Meta:
+        verbose_name = 'FRU信息'
+        verbose_name_plural = verbose_name
+        ordering = ('name',)
+
+    def __str__(self):
+        return '{} / {}'.format(self.name,self.desc)
+
+# 基础类别
 class Base_type(models.Model):
-    name = models.CharField('商品类别', max_length=20)
+    name = models.CharField('备件类别', max_length=20)
     pub_date = models.DateField(u'创建时间', auto_now_add=True)
     author = models.CharField(u'操作人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
 
     # 下面为新增代码
     class Meta:
-        verbose_name = '商品类别'
+        verbose_name = '备件类别'
         verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.name
 
-# 商品品牌
+# 备件品牌
 class Base_brand(models.Model):
-    name = models.CharField('商品品牌', max_length=20)
+    name = models.CharField('备件品牌', max_length=20)
     pub_date = models.DateField(u'创建时间', auto_now_add=True)
     author = models.CharField(u'操作人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
 
     # 下面为新增代码
     class Meta:
-        verbose_name = '商品品牌'
+        verbose_name = '备件品牌'
         verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.name
 
-# 商品子品牌
+# 备件子品牌
 class Base_brand_child(models.Model):
-    name = models.CharField('商品子品牌', max_length=20)
+    name = models.CharField('备件子品牌', max_length=20)
     pub_date = models.DateField(u'创建时间', auto_now_add=True)
     author = models.CharField(u'操作人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
 
     # 下面为新增代码
     class Meta:
-        verbose_name = '商品子品牌'
+        verbose_name = '备件子品牌'
         verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.name
 
-# 商品等级
+# 备件等级
 class Base_level(models.Model):
-    name = models.CharField('商品等级', max_length=20)
+    name = models.CharField('备件等级', max_length=20)
     pub_date = models.DateField(u'创建时间', auto_now_add=True)
     author = models.CharField(u'操作人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
 
     # 下面为新增代码
     class Meta:
-        verbose_name = '商品等级'
+        verbose_name = '备件等级'
         verbose_name_plural = verbose_name
 
     def __str__(self):

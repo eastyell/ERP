@@ -1,0 +1,5 @@
+@echo off
+xcopy E:\MediaID.bin  E:\backup\%date:~0,4%%date:~5,2%%date:~8,2% /S/E/I
+E:
+
+cd E:\backup
