@@ -8,10 +8,10 @@ from common import const
 
 # 礼品信息
 class Gifts(models.Model):
-     status = models.IntegerField(verbose_name=("出入库状态"), choices=const.virtual_status, default=10)
-     name = models.CharField(u'品名', max_length=100, null=True, blank=True)
+     status = models.IntegerField(verbose_name=("出入库状态"), choices=const.gifts_status, default=10)
+     name = models.CharField(u'_____品名_____', max_length=100, null=True, blank=True)
      quantity = models.IntegerField(u'库存数量', null=True, blank=True, default=0)
-     quantity_inout = models.IntegerField(u'出入库', null=True, blank=True, default=0)
+     quantity_inout = models.IntegerField(u'出入库数量', null=True, blank=True, default=0)
      product_date = models.DateField(u'生产日期', null=True, blank=True )
      exp = models.IntegerField(u'保质期(年)', null=True, blank=True, default=0)
      degree = models.FloatField(u'度数(%vol)', null=True, blank=True, default=0)
@@ -42,7 +42,8 @@ class Gifts(models.Model):
      author_checkout = models.CharField(u'出库人', max_length=10, null=True, blank=True, default=None)
      checkout_date = models.DateTimeField(u'出库时间', null=True, blank=True,default = None)
      author_user = models.CharField(u'使用人', max_length=10, null=True, blank=True, default=None)
-     remark = models.TextField(u'备注', null=True, blank=True)
+     remark = models.TextField(u'_____备注_____', null=True, blank=True)
+     pub_date = models.DateTimeField(u'创建时间',  null=True, blank=True,default = None)
 
      # 列表中显示的内容
      def __str__(self):
@@ -51,4 +52,5 @@ class Gifts(models.Model):
      class Meta:
          verbose_name_plural = '礼品信息'
          verbose_name = '礼品信息'
-         ordering = ('name','-status','-checkin_date','-checkout_date' )
+         # ordering = ('name','-status','-checkin_date','-checkout_date' )
+         ordering = ('name','-pub_date' )

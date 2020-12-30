@@ -12,7 +12,8 @@ from common import generic
 
 # 备件信息
 class Shop(models.Model):
-     name = models.CharField(u'备件名称', max_length=30, null=True, blank=True )
+     # name = models.CharField(u'设备类型', max_length=30, null=True, blank=True )
+     name = models.ForeignKey(Device_type, on_delete=models.CASCADE, verbose_name='备件类型', default='0')
      shop_type = models.ForeignKey(Base_type, on_delete=models.CASCADE, verbose_name='备件类别', default='1')
      shop_level = models.ForeignKey(Base_level, on_delete=models.CASCADE, verbose_name='备件等级', default='1')
      shop_brand = models.ForeignKey(Base_brand, on_delete=models.CASCADE, verbose_name='备件品牌', default='1')
@@ -57,9 +58,11 @@ class Suppliers(models.Model):
 
 # 备件明细
 class DeviceStores(models.Model):
+    # typename = models.CharField(u'设备类型', max_length=30, null=True, blank=True)
+    typename = models.ForeignKey(Device_type, on_delete=models.CASCADE, verbose_name='设备类型', default='1')
     ifmachine = models.IntegerField(verbose_name=("是否整机备件"), choices=const.virtual_choice, default=0)
-    machineModel = models.CharField(u'整机型号', max_length=30, null=True, blank=True)
-    machineModels = models.ForeignKey(Device_kind, on_delete=models.CASCADE, verbose_name='整机型号', default='1')
+    machineModel = models.CharField(u'型号', max_length=30, null=True, blank=True)
+    machineModels = models.ForeignKey(Device_kind, on_delete=models.CASCADE, verbose_name='型号', default='1')
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, verbose_name='备件类别', default='1')
     FRUS = models.ForeignKey(Device_FRU, on_delete=models.CASCADE, verbose_name='FRU码 / 描述', default='1')
     FRU = models.CharField(u'FRU码', max_length=15,null=True, blank=True )
@@ -109,6 +112,7 @@ class DeviceStores(models.Model):
         # else:
         #   sql = 'select sum(quantity) from report_manage_stock_detail where fru = "%s" or PN = "%s"' %(fru,pn)
         # print(sql)
+
         sql = 'select sum(quantity) from report_manage_stock_detail where FRUSelect_id = "%s"' %id
         print(sql)
         cds = generic.query(sql)
@@ -120,6 +124,20 @@ class DeviceStores(models.Model):
     quantitys.short_description = u'库存量'
     quantitys.allow_tags = True
 
+    # # 自定义类别
+    # def qytypename(self):
+    #     id = self.shop_id
+    #     sql = 'select b.name from baseinfo_manage_shop a,params_manage_device_type b where a.name_id = b.id and a.id  = "%s"' % id
+    #     print(sql)
+    #     cds = generic.query(sql)
+    #     if cds:
+    #        if cds[0][0] != None:
+    #          return  cds[0][0]
+    #        else: return '无'
+    #     else: return '无'
+
+    # typename.short_description = u'设备类型'
+    # typename.allow_tags = True
     # update_time.editable = True
     # 列表中显示的内容
     def __str__(self):

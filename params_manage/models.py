@@ -103,14 +103,14 @@ class Device_kind(models.Model):
 
 # 备件类别
 class Device_type(models.Model):
-    name = models.CharField('备件类别', max_length=20)
+    name = models.CharField('设备类型', max_length=20)
     pub_date = models.DateField(u'创建时间', auto_now_add=True)
     author = models.CharField(u'操作人', max_length=10, default=None)
     update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     # 下面为新增代码
     class Meta:
-        verbose_name = '备件类别'
+        verbose_name = '设备类型'
         verbose_name_plural = verbose_name
 
     def __str__(self):

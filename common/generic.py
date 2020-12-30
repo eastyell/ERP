@@ -8,6 +8,7 @@ import time
 from email.mime.text import MIMEText
 from email.header import Header
 import smtplib
+from xlrd import open_workbook
 
 # 数据更新
 def update(sql, params=None):
@@ -196,3 +197,22 @@ def getmaillist(title):
    cds = query(sql)
    print(cds)
    return cds
+
+#从EXCEL中获取数据
+def readExcel(xls_name):
+  # 读取excel文件
+  print(xls_name)
+  file = open_workbook(xls_name)
+  # sheet = file.sheet_by_name(sheet_name)
+  print('open_Excel')
+  sheet = file.sheet_by_index(0)
+  # 获取所有行数；
+  nrows = sheet.nrows -1
+  print(nrows)
+  datasTemp = []
+  for i in range(nrows):
+    datasTemp.append(sheet.row_values(i + 1 ))
+  # for i in range(len(datasTemp)):
+  #     print(datasTemp[i])
+  print('success_Excel')
+  return datasTemp

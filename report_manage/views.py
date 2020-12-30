@@ -87,7 +87,7 @@ def StockInGui(sl):
         is_yaxislabel_align=True,
         is_label_show = True,
         is_datazoom_show=True,
-        datazoom_type="both", # 默认为'slider'，有'slider', 'inside', 'both'可选
+        datazoom_type="both",
         line_width = 1,
         # mark_line=["min", "max", "average"],  # 标记线，三个可选项
         # is_animation = True,

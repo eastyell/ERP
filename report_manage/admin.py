@@ -183,6 +183,15 @@ class ImportReplaceIBM(BaseActionView): # 定义一个动作
                 messages.success(self.request, str(len(getValues)) + '条记录，导入成功！')
             except: messages.error(self.request, '文件格式不一致，导入失败！')
 
+        # from tkinter import filedialog
+        #
+        # Fpath = filedialog.askopenfilename()
+        # filename = Fpath
+        # fobj = open(filename, 'r', encoding='UTF-8')
+        # for eachline in fobj:
+        #     print(eachline)
+        # fobj.close()
+
     # 返回 HttpResponse
     # return redirect(self.request.get_full_path())
 

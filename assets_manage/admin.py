@@ -3,6 +3,7 @@ import xadmin
 from assets_manage.models import *
 from xadmin.plugins.actions import BaseActionView
 from common import generic
+from xadmin.layout import Fieldset
 
 # 提交所选的礼品 出入库
 class giftPost(BaseActionView): # 定义一个动作
@@ -41,9 +42,9 @@ class giftPost(BaseActionView): # 定义一个动作
             generic.update(sql)
             # 生成新的出入库记录
             sql = 'insert into assets_manage_gifts' \
-                  '(status,name,product_date,exp,degree,volume,remark,quantity,image,image2) ' \
-                  'select 10,name,product_date,exp,degree,volume,remark,quantity,image,image2 ' \
-                  'from  assets_manage_gifts where id in  %s' %ids
+                  '(status,name,product_date,exp,degree,volume,remark,quantity,image,image2,pub_date) ' \
+                  'select 10,name,product_date,exp,degree,volume,remark,quantity,image,image2,datetime(CURRENT_TIMESTAMP,"localtime") ' \
+                  'from  assets_manage_gifts where id in  %s and (checkin_date <> "" or checkout_date <> "")' %ids
             print(sql)
             generic.update(sql)
 
@@ -57,6 +58,25 @@ class ContactAdminGifts(object):
             obj.save()
         else:
             obj.save()
+
+    def get_form_layout(self):
+        if self.org_obj:
+            self.form_layout = (
+                    Fieldset('礼品信息',
+                             'name','quantity','quantity_inout','product_date','exp','degree','volume',
+                             'image','image2','author_user',
+                             ),
+                    Fieldset('出库信息',
+                             'author_checkout', 'checkout_date'
+                             ),
+                    Fieldset('入库信息',
+                             'author_checkin', 'checkin_date'
+                             ),
+                    Fieldset('其它说明',
+                             'remark'
+                             ),
+            )
+        return super(ContactAdminGifts, self).get_form_layout()
 
 
     # listdisplay设置要显示在列表中的字段（id字段是Django模型的默认主键）
@@ -73,7 +93,7 @@ class ContactAdminGifts(object):
     # list_editable 设置默认可编辑字段,第一个字段不允许编辑
     # list_editable = ['location', ]
     # 设置过滤
-    list_filter = ('author_user','product_date','degree','checkin_date','checkout_date',)
+    list_filter = ('status','checkin_date','checkout_date','product_date','degree','author_user',)
     # fk_fields 设置显示外键字段
     # fk_fields = ('machine_room_id',)
     # 详细时间分层筛选
@@ -84,6 +104,7 @@ class ContactAdminGifts(object):
     list_display_links = ('name',)
     model_icon = 'fa fa-money'  # 图标样式
     exclude = ('status',)
+    # list_editable = ('pub_date')
     actions = [giftPost]
 
 # Register your models here.
